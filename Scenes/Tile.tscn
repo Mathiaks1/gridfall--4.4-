@@ -1,0 +1,36 @@
+[gd_scene load_steps=14 format=3 uid="uid://bucr6jpiogrw8"]
+
+[ext_resource type="Texture2D" uid="uid://bn056o8snjsjf" path="res://Assets/Tiles/tile_hidden.png" id="1_iof5j"]
+[ext_resource type="Script" uid="uid://ddqgtdog8dihh" path="res://Scripts/tile.gd" id="2_r4md0"]
+[ext_resource type="Texture2D" uid="uid://clmm68burjrea" path="res://Assets/Tiles/tile_revealed_0.png" id="3_u3p4p"]
+[ext_resource type="Texture2D" uid="uid://dj7a11spswvag" path="res://Assets/Tiles/tile_revealed_1.png" id="4_7dl2d"]
+[ext_resource type="Texture2D" uid="uid://scc1tyec30ow" path="res://Assets/Tiles/tile_revealed_2.png" id="5_y2ogq"]
+[ext_resource type="Texture2D" uid="uid://i2kb560nense" path="res://Assets/Tiles/tile_revealed_3.png" id="6_neton"]
+[ext_resource type="Texture2D" uid="uid://cpehcnom7vxd7" path="res://Assets/Tiles/tile_revealed_4.png" id="7_vtaw6"]
+[ext_resource type="Texture2D" uid="uid://dtcj12fj6ixtt" path="res://Assets/Tiles/tile_revealed_5.png" id="8_vimel"]
+[ext_resource type="Texture2D" uid="uid://dv2o2x72qdbqn" path="res://Assets/Tiles/tile_revealed_6.png" id="9_afp4t"]
+[ext_resource type="Texture2D" uid="uid://b8di28pqjjxdr" path="res://Assets/Tiles/tile_revealed_7.png" id="10_imfh6"]
+[ext_resource type="Texture2D" uid="uid://ry13np2qb8lh" path="res://Assets/Tiles/tile_revealed_8.png" id="11_jn1er"]
+[ext_resource type="Texture2D" uid="uid://brus82cgq8d2w" path="res://Assets/Tiles/tile_mine.png" id="12_iavu2"]
+[ext_resource type="Texture2D" uid="uid://wu8do11pw3n4" path="res://Assets/Tiles/tile_flag.png" id="13_yilci"]
+
+[node name="Tile" type="TextureButton"]
+texture_filter = 1
+texture_repeat = 1
+anchors_preset = -1
+anchor_left = 0.387
+anchor_top = 0.025
+anchor_right = 0.387
+anchor_bottom = 0.025
+offset_left = -445.824
+offset_top = -16.2
+offset_right = -413.824
+offset_bottom = 15.8
+focus_mode = 0
+texture_normal = ExtResource("1_iof5j")
+stretch_mode = 1
+script = ExtResource("2_r4md0")
+hidden_texture = ExtResource("1_iof5j")
+revealed_textures = Array[Texture2D]([ExtResource("3_u3p4p"), ExtResource("4_7dl2d"), ExtResource("5_y2ogq"), ExtResource("6_neton"), ExtResource("7_vtaw6"), ExtResource("8_vimel"), ExtResource("9_afp4t"), ExtResource("10_imfh6"), ExtResource("11_jn1er")])
+mine_texture = ExtResource("12_iavu2")
+flag_texture = ExtResource("13_yilci")

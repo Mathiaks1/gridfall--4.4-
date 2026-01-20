@@ -1,0 +1,79 @@
+[gd_scene load_steps=2 format=3 uid="uid://bxkmeghi8u0qv"]
+
+[ext_resource type="Script" uid="uid://c7kys4kguucf4" path="res://Scripts/battle_manager.gd" id="1_wvl2i"]
+
+[node name="BattleManager" type="Node2D" node_paths=PackedStringArray("player_hp_bar", "player_hp_label")]
+script = ExtResource("1_wvl2i")
+<<<<<<< HEAD
+player_hp_bar = NodePath("CanvasLayer/BattelUI/PlayerHPBar")
+player_hp_label = NodePath("CanvasLayer/BattelUI/PlayerHPLabel")
+=======
+player_hp_bar = NodePath("BattelUI/PlayerHPBar")
+player_hp_label = NodePath("BattelUI/PlayerHPLabel")
+>>>>>>> 23dff8afd76f4109c4927ce238ae05ff3fe23731
+
+[node name="PlayerPosition" type="Node2D" parent="."]
+
+[node name="Sprite 2D" type="Sprite2D" parent="PlayerPosition"]
+
+[node name="MonsterPosition" type="Node2D" parent="."]
+
+[node name="Sprite 2D" type="Sprite2D" parent="MonsterPosition"]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="BattelUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="PlayerHPBar" type="ProgressBar" parent="CanvasLayer/BattelUI"]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 1
+offset_right = 4.0
+offset_bottom = 27.0
+metadata/_edit_use_anchors_ = true
+
+[node name="PlayerHPLabel" type="Label" parent="CanvasLayer/BattelUI"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+
+[node name="MonsterHPBar" type="ProgressBar" parent="CanvasLayer/BattelUI"]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -20.0
+offset_bottom = 27.0
+grow_horizontal = 0
+
+[node name="MonsterHPLabel" type="Label" parent="CanvasLayer/BattelUI"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+
+[node name="ActionButtons" type="VBoxContainer" parent="CanvasLayer/BattelUI"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="AttackButton" type="Button" parent="CanvasLayer/BattelUI/ActionButtons"]
+layout_mode = 2
+text = "Atak"
+
+[node name="ItemButton" type="Button" parent="CanvasLayer/BattelUI/ActionButtons"]
+layout_mode = 2
+text = "Przedmioty
+"
+
+[node name="RunButton" type="Button" parent="CanvasLayer/BattelUI/ActionButtons"]
+layout_mode = 2
+text = "Ucieknij"
+
+[node name="BattleLog" type="RichTextLabel" parent="CanvasLayer/BattelUI"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
