@@ -1,0 +1,21 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/grid/grid_manager.gd" id="1_grid"]
+[ext_resource type="PackedScene" path="res://scenes/grid/Tile.tscn" id="2_tile"]
+[ext_resource type="Resource" path="res://data/default_tile_skin.tres" id="3_skin"]
+[ext_resource type="Script" path="res://scripts/input/grid_input.gd" id="4_input"]
+
+[node name="GridManager" type="Control"]
+clip_contents = true
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_grid")
+tile_scene = ExtResource("2_tile")
+skin = ExtResource("3_skin")
+
+[node name="GridInput" type="Node" parent="."]
+script = ExtResource("4_input")

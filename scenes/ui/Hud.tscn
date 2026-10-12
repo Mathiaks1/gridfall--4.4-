@@ -1,0 +1,40 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/ui/hud.gd" id="1_hud"]
+
+[node name="Hud" type="HBoxContainer"]
+custom_minimum_size = Vector2(0, 52)
+theme_override_constants/separation = 16
+script = ExtResource("1_hud")
+
+[node name="FloorLabel" type="Label" parent="."]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Floor"
+vertical_alignment = 1
+
+[node name="HazardLabel" type="Label" parent="."]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Hazards"
+vertical_alignment = 1
+
+[node name="Spacer" type="Control" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="FlagModeButton" type="Button" parent="."]
+custom_minimum_size = Vector2(150, 48)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 22
+toggle_mode = true
+text = "Flag mode"
+
+[node name="RestartButton" type="Button" parent="."]
+custom_minimum_size = Vector2(130, 48)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 22
+text = "Restart"

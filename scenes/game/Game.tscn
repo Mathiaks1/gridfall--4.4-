@@ -1,0 +1,54 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/game/game.gd" id="1_game"]
+[ext_resource type="Resource" path="res://data/default_floor_config.tres" id="2_config"]
+[ext_resource type="Script" path="res://scenes/ui/safe_area_container.gd" id="3_safe"]
+[ext_resource type="PackedScene" path="res://scenes/ui/Hud.tscn" id="4_hud"]
+[ext_resource type="PackedScene" path="res://scenes/grid/GridManager.tscn" id="5_grid"]
+[ext_resource type="PackedScene" path="res://scenes/ui/GameOverScreen.tscn" id="6_over"]
+
+[node name="Game" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_game")
+floor_config = ExtResource("2_config")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.055, 0.06, 0.075, 1)
+
+[node name="SafeArea" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_safe")
+
+[node name="Layout" type="VBoxContainer" parent="SafeArea"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Hud" parent="SafeArea/Layout" instance=ExtResource("4_hud")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="GridManager" parent="SafeArea/Layout" instance=ExtResource("5_grid")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="GameOverScreen" parent="." instance=ExtResource("6_over")]
+unique_name_in_owner = true
+layout_mode = 1
