@@ -12,8 +12,9 @@ signal floor_started(floor_number: int)
 signal cells_revealed(cells: Array[Vector2i])
 
 ## Pole wymaga reakcji gry: uruchomione zagrożenie albo dotknięte pole specjalne.
+## content = GridModel.Content (int, żeby autoload nie zależał od innych skryptów).
 @warning_ignore("unused_signal")
-signal cell_activated(cell: Vector2i, content: GridModel.Content)
+signal cell_activated(cell: Vector2i, content: int)
 
 @warning_ignore("unused_signal")
 signal flags_changed(placed: int, hazard_total: int)

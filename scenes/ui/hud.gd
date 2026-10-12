@@ -1,9 +1,12 @@
 class_name Hud
 extends HFlowContainer
-## Górny pasek: piętro, HP, złoto, poziom, statystyki, licznik zagrożeń, tryb flagi (dotyk), restart.
+## Górny pasek: piętro, HP, złoto, poziom, statystyki, licznik zagrożeń, tryb flagi (dotyk),
+## punkty atrybutów, ekwipunek, menu.
 ## HFlowContainer zawija elementy na wąskich (pionowych) ekranach.
 
-signal restart_pressed
+signal inventory_pressed
+signal points_pressed
+signal menu_pressed
 
 var _player: PlayerStats
 
@@ -15,15 +18,21 @@ var _player: PlayerStats
 @onready var _stats_label: Label = $StatsLabel
 @onready var _hazard_label: Label = $HazardLabel
 @onready var _flag_mode_button: Button = $FlagModeButton
-@onready var _restart_button: Button = $RestartButton
+@onready var _points_button: Button = $PointsButton
+@onready var _inventory_button: Button = $InventoryButton
+@onready var _menu_button: Button = $MenuButton
 
 
 func _ready() -> void:
-	_restart_button.text = UiText.t(&"hud_restart")
+	_inventory_button.text = UiText.t(&"hud_inventory")
+	_menu_button.text = UiText.t(&"hud_menu")
+	_points_button.hide()
 	_flag_mode_button.text = UiText.t(&"hud_flag_mode")
 	_flag_mode_button.visible = DisplayServer.is_touchscreen_available()
 	_flag_mode_button.toggled.connect(_on_flag_mode_toggled)
-	_restart_button.pressed.connect(restart_pressed.emit)
+	_inventory_button.pressed.connect(inventory_pressed.emit)
+	_points_button.pressed.connect(points_pressed.emit)
+	_menu_button.pressed.connect(menu_pressed.emit)
 	EventBus.flags_changed.connect(_on_flags_changed)
 	EventBus.floor_started.connect(_on_floor_started)
 
@@ -38,12 +47,14 @@ func bind_player(player: PlayerStats) -> void:
 
 
 func _refresh_player() -> void:
-	_hp_bar.max_value = _player.max_hp
+	_hp_bar.max_value = _player.get_max_hp()
 	_hp_bar.value = _player.hp
-	_hp_label.text = UiText.t(&"hud_hp") % [_player.hp, _player.max_hp]
+	_hp_label.text = UiText.t(&"hud_hp") % [_player.hp, _player.get_max_hp()]
 	_gold_label.text = UiText.t(&"hud_gold") % _player.gold
 	_level_label.text = UiText.t(&"hud_level") % [_player.level, _player.experience, _player.get_exp_to_next_level()]
-	_stats_label.text = UiText.t(&"hud_stats") % [_player.attack, _player.defense]
+	_stats_label.text = UiText.t(&"hud_stats") % [_player.get_attack(), _player.get_defense()]
+	_points_button.visible = _player.attribute_points > 0
+	_points_button.text = UiText.t(&"hud_points") % _player.attribute_points
 
 
 func _on_floor_started(floor_number: int) -> void:

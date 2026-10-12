@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://dilxkaqmtrobl"]
+
+[ext_resource type="Script" path="res://Scripts/grid_manager.gd" id="1_iukft"]
+[ext_resource type="PackedScene" uid="uid://blcyd3jw5xlok" path="res://Scenes/Tile.tscn" id="2_gl6un"]
+[ext_resource type="PackedScene" uid="uid://svr00jvvdt8k" path="res://Scenes/Player.tscn" id="3_j5yw3"]
+
+[node name="GridManager" type="Node2D" unique_id=916120591]
+script = ExtResource("1_iukft")
+grid_width = 6
+grid_height = 6
+tile_scene = ExtResource("2_gl6un")
+
+[node name="Player" parent="." unique_id=759123655 instance=ExtResource("3_j5yw3")]

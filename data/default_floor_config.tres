@@ -1,11 +1,6 @@
 [gd_resource type="Resource" script_class="FloorConfig" format=3]
 
 [ext_resource type="Script" path="res://data/floor_config.gd" id="1_floor"]
-[ext_resource type="Script" path="res://data/monster_data.gd" id="6_mdata"]
-[ext_resource type="Resource" path="res://data/monsters/rat.tres" id="2_rat"]
-[ext_resource type="Resource" path="res://data/monsters/goblin.tres" id="3_goblin"]
-[ext_resource type="Resource" path="res://data/monsters/skeleton.tres" id="4_skeleton"]
-[ext_resource type="Resource" path="res://data/monsters/orc.tres" id="5_orc"]
 
 [resource]
 script = ExtResource("1_floor")
@@ -18,7 +13,6 @@ base_hazard_density = 0.12
 hazard_density_per_floor = 0.008
 max_hazard_density = 0.22
 safe_radius = 1
-monster_pool = Array[ExtResource("6_mdata")]([ExtResource("2_rat"), ExtResource("3_goblin"), ExtResource("4_skeleton"), ExtResource("5_orc")])
 monster_share = 0.4
 base_monster_power = 1
 monster_power_per_floor = 0.5
@@ -30,5 +24,17 @@ max_treasure_count = 6
 treasure_gold_min = 4
 treasure_gold_max = 12
 treasure_gold_growth = 0.15
+treasure_item_chance = 0.25
+treasure_material_chance = 0.3
+base_resource_count = 1
+resource_count_per_floor = 0.2
+max_resource_count = 4
+shop_chance = 0.4
+shop_min_floor = 1
+shop_stock_size = 4
+shop_price_growth = 0.1
+sell_price_ratio = 0.4
+blacksmith_chance = 0.3
+blacksmith_min_floor = 2
 has_exit = true
 heal_on_descend = 0.25

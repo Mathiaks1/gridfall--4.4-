@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CraftingMaterial" format=3]
+
+[ext_resource type="Script" path="res://data/crafting_material.gd" id="1_mat"]
+[ext_resource type="Texture2D" path="res://assets/art/resources/resource_dragon_scale.png" id="tex_icon"]
+
+[resource]
+script = ExtResource("1_mat")
+id = &"dragon_scale"
+name_key = &"material_dragon_scale"
+rarity = 2
+min_floor = 4
+drop_weight = 0.6
+weight_per_floor = 0.25
+color = Color(0.9, 0.35, 0.25, 1)
+icon = ExtResource("tex_icon")

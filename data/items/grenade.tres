@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://data/item_data.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"grenade"
+name_key = &"item_grenade"
+desc_key = &"item_grenade_desc"
+kind = 0
+effect = 4
+power = 12
+radius = 1
+price = 22
+min_floor = 2
+sold_in_shop = true
+found_in_treasure = true
+attack_bonus = 0
+defense_bonus = 0
+attack_per_upgrade = 0
+defense_per_upgrade = 0
+color = Color(0.95, 0.55, 0.2, 1)

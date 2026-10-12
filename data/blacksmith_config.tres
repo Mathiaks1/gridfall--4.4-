@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="BlacksmithConfig" format=3]
+
+[ext_resource type="Script" path="res://data/blacksmith_config.gd" id="1_smith"]
+
+[resource]
+script = ExtResource("1_smith")
+max_upgrade_level = 5
+gold_costs = PackedInt32Array(15, 30, 55, 90, 140)
+material_costs = Array[Dictionary]([{
+&"iron_ore": 2
+}, {
+&"iron_ore": 3
+}, {
+&"iron_ore": 3,
+&"magic_crystal": 1
+}, {
+&"iron_ore": 4,
+&"magic_crystal": 2
+}, {
+&"dragon_scale": 1,
+&"magic_crystal": 2
+}])

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://data/item_data.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"chainmail"
+name_key = &"item_chainmail"
+desc_key = &"item_chainmail_desc"
+kind = 2
+effect = 0
+power = 0
+radius = 1
+price = 80
+min_floor = 3
+sold_in_shop = true
+found_in_treasure = false
+attack_bonus = 0
+defense_bonus = 3
+attack_per_upgrade = 0
+defense_per_upgrade = 1
+color = Color(0.65, 0.7, 0.75, 1)

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3]
+
+[ext_resource type="Script" path="res://data/monster_data.gd" id="1_monster"]
+[ext_resource type="Texture2D" path="res://assets/art/monsters/monster_ghoul_icon.png" id="tex_texture"]
+[ext_resource type="Texture2D" path="res://assets/art/monsters/monster_ghoul_battle_idle.png" id="tex_battle_sheet"]
+
+[resource]
+script = ExtResource("1_monster")
+id = &"ghoul"
+name_key = &"monster_ghoul"
+min_floor = 4
+max_hp = 16
+attack = 6
+defense = 1
+gold_reward = 10
+exp_reward = 18
+color = Color(0.46, 0.45, 0.51, 1)
+texture = ExtResource("tex_texture")
+battle_sheet = ExtResource("tex_battle_sheet")
+battle_fps = 5.0

@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://data/item_data.gd" id="1_item"]
+[ext_resource type="Texture2D" path="res://assets/art/items/item_potion_health.png" id="tex_icon"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"potion_large"
+name_key = &"item_potion_large"
+desc_key = &"item_potion_large_desc"
+kind = 0
+effect = 1
+power = 25
+radius = 1
+price = 28
+min_floor = 3
+sold_in_shop = true
+found_in_treasure = true
+attack_bonus = 0
+defense_bonus = 0
+attack_per_upgrade = 0
+defense_per_upgrade = 0
+color = Color(0.95, 0.15, 0.35, 1)
+icon = ExtResource("tex_icon")

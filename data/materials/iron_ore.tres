@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CraftingMaterial" format=3]
+
+[ext_resource type="Script" path="res://data/crafting_material.gd" id="1_mat"]
+[ext_resource type="Texture2D" path="res://assets/art/resources/resource_iron_ore.png" id="tex_icon"]
+
+[resource]
+script = ExtResource("1_mat")
+id = &"iron_ore"
+name_key = &"material_iron_ore"
+rarity = 0
+min_floor = 1
+drop_weight = 10.0
+weight_per_floor = -0.3
+color = Color(0.6, 0.6, 0.65, 1)
+icon = ExtResource("tex_icon")

@@ -1,0 +1,10 @@
+{
+  "name": "monster_ghoul_battle_idle",
+  "animation": "idle",
+  "frame_width": 64,
+  "frame_height": 64,
+  "frames": 4,
+  "fps": 5,
+  "loop": true,
+  "layout": "horizontal"
+}

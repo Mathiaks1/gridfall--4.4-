@@ -6,9 +6,13 @@ extends Control
 @export var tile_scene: PackedScene
 @export var skin: TileSkin
 @export var max_tile_size: float = 72.0
+## Rozmiar grafiki pola (px). Pole na ekranie = całkowita wielokrotność, żeby pixel art się nie rozmywał.
+@export var art_tile_size: int = 32
 
 var model: GridModel
 var interactive: bool = false
+## (cell: Vector2i) -> Texture2D: ikona konkretnego potwora/surowca na polu. Pusty = ikony ogólne ze skina.
+var icon_resolver: Callable
 
 var _tiles: Array[Tile] = []
 var _tile_size: float = 32.0
@@ -16,6 +20,12 @@ var _origin := Vector2.ZERO
 var _held_cell := GridModel.INVALID_CELL
 var _solution_shown: bool = false
 var _highlighted_cell := GridModel.INVALID_CELL
+## Tryb wskazywania pola (zwój, granat): następne "odkryj" wywołuje _target_selected, "flaga" anuluje.
+var _target_selected: Callable
+var _target_cancelled: Callable
+
+## Pola specjalne aktywowane od razu po odkryciu kliknięciem (wyjście wymaga drugiego dotknięcia).
+const AUTO_ACTIVATE := [GridModel.Content.TREASURE, GridModel.Content.RESOURCE, GridModel.Content.SHOP, GridModel.Content.BLACKSMITH]
 
 @onready var _grid_input: GridInput = $GridInput
 
@@ -30,6 +40,8 @@ func _ready() -> void:
 ## Podpina nowy model (nowy run / nowe piętro) i odbudowuje pola.
 func setup(p_model: GridModel) -> void:
 	_grid_input.cancel()
+	_target_selected = Callable()
+	_target_cancelled = Callable()
 	model = p_model
 	_solution_shown = false
 	_held_cell = GridModel.INVALID_CELL
@@ -58,12 +70,43 @@ func resolve_cell(cell: Vector2i) -> void:
 	_refresh_tile(_tile_at(cell))
 
 
+## Odświeża pola zmienione poza akcjami gracza (zwój, granat) i ogłasza odkrycia.
+func apply_external_changes(cells: Array[Vector2i]) -> void:
+	if model == null:
+		return
+	_refresh_cells(cells)
+	_emit_hazard_counter()
+	if not cells.is_empty():
+		EventBus.cells_revealed.emit(cells)
+
+
+func begin_targeting(on_selected: Callable, on_cancelled: Callable) -> void:
+	cancel_targeting()
+	_target_selected = on_selected
+	_target_cancelled = on_cancelled
+
+
+func cancel_targeting() -> void:
+	if not _target_selected.is_valid():
+		return
+	var on_cancelled := _target_cancelled
+	_target_selected = Callable()
+	_target_cancelled = Callable()
+	if on_cancelled.is_valid():
+		on_cancelled.call()
+
+
+func is_targeting() -> bool:
+	return _target_selected.is_valid()
+
+
 ## Po porażce: pokazuje wszystkie zagrożenia i błędne flagi.
 func show_solution() -> void:
 	if model == null:
 		return
 	interactive = false
 	_grid_input.cancel()
+	cancel_targeting()
 	model.reveal_all_hazards()
 	_solution_shown = true
 	_refresh_all()
@@ -76,6 +119,15 @@ func _gui_input(event: InputEvent) -> void:
 
 func _on_action_triggered(action: GridInput.Action, cell: Vector2i) -> void:
 	if not interactive or model == null or not model.is_inside(cell):
+		return
+	if is_targeting():
+		if action == GridInput.Action.REVEAL:
+			var on_selected := _target_selected
+			_target_selected = Callable()
+			_target_cancelled = Callable()
+			on_selected.call(cell)
+		else:
+			cancel_targeting()
 		return
 	match action:
 		GridInput.Action.REVEAL:
@@ -91,11 +143,15 @@ func _handle_reveal(cell: Vector2i) -> void:
 	if not was_hidden and model.get_state(cell) != GridModel.CellState.REVEALED:
 		return
 
-	# Dotknięcie odkrytego pola specjalnego (skarb, wyjście) = aktywacja
-	if not was_hidden and model.is_special(cell):
-		if not model.is_resolved(cell):
-			EventBus.cell_activated.emit(cell, model.get_content(cell))
-		return
+	if not was_hidden:
+		# Dotknięcie odkrytego pola specjalnego (skarb, sklep, wyjście...) albo rannego potwora = aktywacja
+		var content := model.get_content(cell)
+		if model.is_special(cell) or content == GridModel.Content.MONSTER:
+			if not model.is_resolved(cell):
+				EventBus.cell_activated.emit(cell, content)
+			return
+		if model.is_hazard(cell):
+			return
 
 	var revealed := model.reveal(cell) if was_hidden else model.chord(cell)
 	if revealed.is_empty():
@@ -114,9 +170,8 @@ func _handle_reveal(cell: Vector2i) -> void:
 			_emit_hazard_counter()
 			EventBus.cell_activated.emit(c, model.get_content(c))
 			return
-	# Skarb odkryty bezpośrednim kliknięciem zbieramy od razu; wyjście wymaga drugiego dotknięcia
-	if was_hidden and model.get_content(cell) == GridModel.Content.TREASURE:
-		EventBus.cell_activated.emit(cell, GridModel.Content.TREASURE)
+	if was_hidden and model.get_content(cell) in AUTO_ACTIVATE:
+		EventBus.cell_activated.emit(cell, model.get_content(cell))
 
 
 func _emit_hazard_counter() -> void:
@@ -138,7 +193,12 @@ func _layout_tiles() -> void:
 		return
 	# Pola kwadratowe, dopasowane do mniejszego wymiaru. Faza 4: pan/zoom dla dużych siatek na telefonie.
 	var fit := minf(size.x / model.width, size.y / model.height)
-	_tile_size = maxf(floorf(minf(fit, max_tile_size)), 4.0)
+	var factor := floori(minf(fit, maxf(max_tile_size, art_tile_size)) / art_tile_size)
+	if factor >= 1:
+		_tile_size = float(factor * art_tile_size)
+	else:
+		# Za mało miejsca na pełny rozmiar grafiki — awaryjnie skala ułamkowa.
+		_tile_size = maxf(floorf(fit), 4.0)
 	var board_size := Vector2(model.width, model.height) * _tile_size
 	_origin = ((size - board_size) * 0.5).floor()
 	for tile in _tiles:
@@ -170,4 +230,5 @@ func _refresh_cells(cells: Array[Vector2i]) -> void:
 
 func _refresh_tile(tile: Tile) -> void:
 	var c := tile.cell
+	tile.set_icon(icon_resolver.call(c) if icon_resolver.is_valid() else null)
 	tile.set_view(model.get_state(c), model.get_content(c), model.get_danger(c), model.is_resolved(c), c == model.exploded_cell, _solution_shown)

@@ -1,0 +1,10 @@
+{
+  "name": "monster_slime_battle_idle",
+  "animation": "idle",
+  "frame_width": 64,
+  "frame_height": 64,
+  "frames": 4,
+  "fps": 6,
+  "loop": true,
+  "layout": "horizontal"
+}

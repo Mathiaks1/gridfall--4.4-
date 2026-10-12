@@ -157,6 +157,6 @@ func test_floor_config_scaling() -> void:
 	check(config.get_width(10) >= config.get_width(1), "siatka rośnie z piętrem")
 	check_eq(config.get_width(1000), config.max_width, "szerokość ograniczona maksimum")
 	check(config.get_hazard_density(1000) <= config.max_hazard_density, "gęstość ograniczona maksimum")
-	var model := GridModel.create_for_floor(config, 1, 42)
+	var model := GridModel.create_for_floor(config, null, 1, 42)
 	check_eq(model.width, config.get_width(1), "model z konfiguracji: szerokość")
 	check_eq(model.hazard_count, config.get_hazard_count(1), "model z konfiguracji: zagrożenia")

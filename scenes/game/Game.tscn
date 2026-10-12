@@ -8,6 +8,15 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/GameOverScreen.tscn" id="6_over"]
 [ext_resource type="Resource" path="res://data/player_base_stats.tres" id="7_player"]
 [ext_resource type="PackedScene" path="res://scenes/ui/MessageLog.tscn" id="8_log"]
+[ext_resource type="Resource" path="res://data/game_database.tres" id="9_db"]
+[ext_resource type="Resource" path="res://data/blacksmith_config.tres" id="10_smith"]
+[ext_resource type="PackedScene" path="res://scenes/ui/CombatScreen.tscn" id="11_combat"]
+[ext_resource type="PackedScene" path="res://scenes/ui/ShopScreen.tscn" id="12_shop"]
+[ext_resource type="PackedScene" path="res://scenes/ui/BlacksmithScreen.tscn" id="13_smith_ui"]
+[ext_resource type="PackedScene" path="res://scenes/ui/InventoryScreen.tscn" id="14_inv"]
+[ext_resource type="PackedScene" path="res://scenes/ui/LevelUpScreen.tscn" id="15_lvl"]
+[ext_resource type="PackedScene" path="res://scenes/ui/PauseMenu.tscn" id="16_pause"]
+[ext_resource type="PackedScene" path="res://scenes/ui/OptionsScreen.tscn" id="17_options"]
 
 [node name="Game" type="Control"]
 layout_mode = 3
@@ -18,6 +27,8 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_game")
 floor_config = ExtResource("2_config")
+database = ExtResource("9_db")
+blacksmith_config = ExtResource("10_smith")
 base_player_stats = ExtResource("7_player")
 
 [node name="Background" type="ColorRect" parent="."]
@@ -54,6 +65,41 @@ size_flags_vertical = 3
 
 [node name="MessageLog" parent="SafeArea/Layout" instance=ExtResource("8_log")]
 layout_mode = 2
+
+[node name="CombatScreen" parent="." instance=ExtResource("11_combat")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+
+[node name="ShopScreen" parent="." instance=ExtResource("12_shop")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+
+[node name="BlacksmithScreen" parent="." instance=ExtResource("13_smith_ui")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+
+[node name="InventoryScreen" parent="." instance=ExtResource("14_inv")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+
+[node name="LevelUpScreen" parent="." instance=ExtResource("15_lvl")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+
+[node name="PauseMenu" parent="." instance=ExtResource("16_pause")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+
+[node name="OptionsScreen" parent="." instance=ExtResource("17_options")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
 
 [node name="GameOverScreen" parent="." instance=ExtResource("6_over")]
 unique_name_in_owner = true

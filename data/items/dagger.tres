@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://data/item_data.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"dagger"
+name_key = &"item_dagger"
+desc_key = &"item_dagger_desc"
+kind = 1
+effect = 0
+power = 0
+radius = 1
+price = 10
+min_floor = 1
+sold_in_shop = false
+found_in_treasure = false
+attack_bonus = 1
+defense_bonus = 0
+attack_per_upgrade = 1
+defense_per_upgrade = 0
+color = Color(0.7, 0.7, 0.75, 1)

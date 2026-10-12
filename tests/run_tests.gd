@@ -6,6 +6,7 @@ extends SceneTree
 const SUITES: Array[String] = [
 	"res://tests/test_grid_model.gd",
 	"res://tests/test_rpg.gd",
+	"res://tests/test_progression.gd",
 ]
 
 
@@ -14,6 +15,10 @@ func _initialize() -> void:
 	var failed := 0
 	for path in SUITES:
 		var script: GDScript = load(path)
+		if script == null or not script.can_instantiate():
+			failed += 1
+			print("  FAIL  %s: nie udało się wczytać skryptu" % path)
+			continue
 		for method in script.get_script_method_list():
 			var method_name: String = method["name"]
 			if not method_name.begins_with("test_"):

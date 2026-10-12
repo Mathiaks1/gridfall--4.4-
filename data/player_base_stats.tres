@@ -1,14 +1,33 @@
 [gd_resource type="Resource" script_class="PlayerStats" format=3]
 
 [ext_resource type="Script" path="res://data/player_stats.gd" id="1_player"]
+[ext_resource type="Script" path="res://data/item_data.gd" id="2_item"]
+[ext_resource type="Resource" path="res://data/items/dagger.tres" id="3_dagger"]
+[ext_resource type="Resource" path="res://data/items/cloth_armor.tres" id="4_cloth"]
+[ext_resource type="Resource" path="res://data/items/potion_small.tres" id="5_potion"]
 
 [resource]
 script = ExtResource("1_player")
-max_hp = 30
-attack = 5
-defense = 1
+base_max_hp = 25
+base_attack = 3
+base_defense = 1
+starting_attributes = PackedInt32Array(1, 1, 1, 1, 1)
+starting_gold = 0
+starting_items = Array[ExtResource("2_item")]([ExtResource("3_dagger"), ExtResource("4_cloth"), ExtResource("5_potion")])
+hp_per_vitality = 5
+attack_per_strength = 1
+crit_chance_per_luck = 0.03
+max_crit_chance = 0.5
+crit_multiplier = 1.5
+trap_dodge_per_luck = 0.04
+max_trap_dodge = 0.5
+loot_bonus_per_luck = 0.05
+price_discount_per_charisma = 0.03
+max_price_discount = 0.45
+item_power_per_intelligence = 0.1
+intelligence_per_scry_radius = 4
+flee_chance_base = 0.35
+flee_chance_per_luck = 0.05
 exp_to_level_base = 20
 exp_to_level_growth = 1.5
-hp_per_level = 5
-attack_per_level = 1
-defense_per_level = 0
+attribute_points_per_level = 3

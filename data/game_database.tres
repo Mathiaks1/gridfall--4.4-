@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="GameDatabase" format=3]
+
+[ext_resource type="Script" path="res://data/game_database.gd" id="1_db"]
+[ext_resource type="Script" path="res://data/item_data.gd" id="2_item"]
+[ext_resource type="Script" path="res://data/crafting_material.gd" id="3_mat"]
+[ext_resource type="Script" path="res://data/monster_data.gd" id="4_mon"]
+[ext_resource type="Resource" path="res://data/items/potion_small.tres" id="10_potion_small"]
+[ext_resource type="Resource" path="res://data/items/potion_large.tres" id="11_potion_large"]
+[ext_resource type="Resource" path="res://data/items/scroll_scry.tres" id="12_scroll_scry"]
+[ext_resource type="Resource" path="res://data/items/scroll_return.tres" id="13_scroll_return"]
+[ext_resource type="Resource" path="res://data/items/grenade.tres" id="14_grenade"]
+[ext_resource type="Resource" path="res://data/items/dagger.tres" id="15_dagger"]
+[ext_resource type="Resource" path="res://data/items/sword.tres" id="16_sword"]
+[ext_resource type="Resource" path="res://data/items/axe.tres" id="17_axe"]
+[ext_resource type="Resource" path="res://data/items/cloth_armor.tres" id="18_cloth_armor"]
+[ext_resource type="Resource" path="res://data/items/leather_armor.tres" id="19_leather_armor"]
+[ext_resource type="Resource" path="res://data/items/chainmail.tres" id="20_chainmail"]
+[ext_resource type="Resource" path="res://data/items/plate_armor.tres" id="21_plate_armor"]
+[ext_resource type="Resource" path="res://data/materials/iron_ore.tres" id="22_iron_ore"]
+[ext_resource type="Resource" path="res://data/materials/magic_crystal.tres" id="23_magic_crystal"]
+[ext_resource type="Resource" path="res://data/materials/dragon_scale.tres" id="24_dragon_scale"]
+[ext_resource type="Resource" path="res://data/monsters/rat.tres" id="25_rat"]
+[ext_resource type="Resource" path="res://data/monsters/goblin.tres" id="26_goblin"]
+[ext_resource type="Resource" path="res://data/monsters/skeleton.tres" id="27_skeleton"]
+[ext_resource type="Resource" path="res://data/monsters/orc.tres" id="28_orc"]
+[ext_resource type="Resource" path="res://data/monsters/slime.tres" id="29_slime"]
+[ext_resource type="Resource" path="res://data/monsters/ghoul.tres" id="30_ghoul"]
+
+[resource]
+script = ExtResource("1_db")
+items = Array[ExtResource("2_item")]([ExtResource("10_potion_small"), ExtResource("11_potion_large"), ExtResource("12_scroll_scry"), ExtResource("13_scroll_return"), ExtResource("14_grenade"), ExtResource("15_dagger"), ExtResource("16_sword"), ExtResource("17_axe"), ExtResource("18_cloth_armor"), ExtResource("19_leather_armor"), ExtResource("20_chainmail"), ExtResource("21_plate_armor")])
+materials = Array[ExtResource("3_mat")]([ExtResource("22_iron_ore"), ExtResource("23_magic_crystal"), ExtResource("24_dragon_scale")])
+monsters = Array[ExtResource("4_mon")]([ExtResource("25_rat"), ExtResource("26_goblin"), ExtResource("27_skeleton"), ExtResource("28_orc"), ExtResource("29_slime"), ExtResource("30_ghoul")])

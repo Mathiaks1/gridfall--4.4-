@@ -13,3 +13,8 @@ var exp_reward: int = 0
 
 func get_display_name() -> String:
 	return UiText.t(data.name_key) if data else "?"
+
+
+## Zapis rannego potwora (gracz uciekł z walki).
+func to_dict() -> Dictionary:
+	return {"id": data.id if data else &"", "hp": hp}

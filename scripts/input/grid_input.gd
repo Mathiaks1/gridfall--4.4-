@@ -10,11 +10,10 @@ signal action_triggered(action: Action, cell: Vector2i)
 ## ratio 0..1; 0 = koniec/anulowanie podglądu przytrzymania.
 signal hold_progress_changed(cell: Vector2i, ratio: float)
 
-@export var long_press_time: float = 0.4
+## Czas przytrzymania i wibracje pochodzą z GameSettings (ekran Opcji).
 ## Opóźnienie, po którym zaczyna się wizualny feedback przytrzymania (żeby zwykły tap nie migał).
 @export var hold_feedback_delay: float = 0.08
 @export var drag_cancel_distance: float = 16.0
-@export var vibrate_on_long_press: bool = true
 ## Do testów sterowania dotykowego myszą na PC.
 @export var force_touch_mode: bool = false
 
@@ -31,6 +30,7 @@ var _long_press_fired: bool = false
 
 
 func _ready() -> void:
+	GameSettings.ensure_loaded()
 	set_process(false)
 	EventBus.flag_mode_changed.connect(_on_flag_mode_changed)
 
@@ -64,13 +64,14 @@ func _process(delta: float) -> void:
 		set_process(false)
 		return
 	_press_time += delta
+	var long_press_time := GameSettings.long_press_time
 	if _press_time >= hold_feedback_delay:
 		var ratio := clampf((_press_time - hold_feedback_delay) / maxf(long_press_time - hold_feedback_delay, 0.001), 0.0, 1.0)
 		hold_progress_changed.emit(_press_cell, ratio)
 	if _press_time >= long_press_time:
 		_long_press_fired = true
 		hold_progress_changed.emit(_press_cell, 0.0)
-		if vibrate_on_long_press:
+		if GameSettings.vibration:
 			Input.vibrate_handheld(30)
 		action_triggered.emit(Action.REVEAL if flag_mode else Action.FLAG, _press_cell)
 		set_process(false)

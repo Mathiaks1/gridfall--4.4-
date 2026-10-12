@@ -1,6 +1,8 @@
 [gd_resource type="Resource" script_class="MonsterData" format=3]
 
 [ext_resource type="Script" path="res://data/monster_data.gd" id="1_monster"]
+[ext_resource type="Texture2D" path="res://assets/art/monsters/monster_skeleton_icon.png" id="tex_texture"]
+[ext_resource type="Texture2D" path="res://assets/art/monsters/monster_skeleton_battle_idle.png" id="tex_battle_sheet"]
 
 [resource]
 script = ExtResource("1_monster")
@@ -13,3 +15,5 @@ defense = 2
 gold_reward = 8
 exp_reward = 14
 color = Color(0.85, 0.85, 0.8, 1)
+texture = ExtResource("tex_texture")
+battle_sheet = ExtResource("tex_battle_sheet")

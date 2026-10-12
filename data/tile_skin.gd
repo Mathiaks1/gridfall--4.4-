@@ -18,6 +18,9 @@ extends Resource
 @export var treasure_color := Color("8a5a2b")
 @export var treasure_trim_color := Color("f0c040")
 @export var exit_color := Color("4fc3d9")
+@export var shop_color := Color("3fa86b")
+@export var blacksmith_color := Color("9aa3b5")
+@export var resource_color := Color("7fd4ff")
 ## Przezroczystość ikon pól rozpatrzonych (pokonany potwór, zebrany skarb, zużyta pułapka).
 @export_range(0.0, 1.0, 0.05) var resolved_alpha: float = 0.35
 ## Kolory cyfr 1–8 (indeks 0 = cyfra 1).
@@ -34,8 +37,29 @@ extends Resource
 @export var monster_texture: Texture2D
 @export var treasure_texture: Texture2D
 @export var exit_texture: Texture2D
+@export var shop_texture: Texture2D
+@export var blacksmith_texture: Texture2D
+@export var resource_texture: Texture2D
 ## Tekstury cyfr: indeks = liczba (0–8). Puste/brakujące = rysowanie tekstem.
 @export var number_textures: Array[Texture2D] = []
+## Małe cyfry w rogu pól specjalnych (indeks = liczba). Puste = tekst.
+@export var small_number_textures: Array[Texture2D] = []
+## Tło odkrytego zagrożenia, które właśnie zadziałało.
+@export var revealed_danger_texture: Texture2D
+@export var wrong_flag_texture: Texture2D
+
+@export_group("Resolved textures (optional)")
+## Pola rozpatrzone: osobne sprite'y zamiast półprzezroczystości (resolved_alpha to fallback).
+@export var trap_resolved_texture: Texture2D
+@export var monster_resolved_texture: Texture2D
+@export var treasure_resolved_texture: Texture2D
+@export var resource_resolved_texture: Texture2D
+
+@export_group("Reveal animation (optional)")
+## Sprite sheet (klatki w poziomie) odgrywany przy odkryciu pola.
+@export var reveal_animation: Texture2D
+@export_range(1, 16) var reveal_frames: int = 4
+@export_range(1.0, 60.0) var reveal_fps: float = 20.0
 
 @export_group("Text")
 ## Pusty = domyślna czcionka silnika.
@@ -47,6 +71,12 @@ func get_number_color(number: int) -> Color:
 	if number >= 1 and number <= number_colors.size():
 		return number_colors[number - 1]
 	return Color.WHITE
+
+
+func get_small_number_texture(number: int) -> Texture2D:
+	if number >= 0 and number < small_number_textures.size():
+		return small_number_textures[number]
+	return null
 
 
 func get_number_texture(number: int) -> Texture2D:

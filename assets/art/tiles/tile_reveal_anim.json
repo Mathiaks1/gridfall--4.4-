@@ -1,0 +1,10 @@
+{
+  "name": "tile_reveal_anim",
+  "animation": "reveal",
+  "frame_width": 32,
+  "frame_height": 32,
+  "frames": 4,
+  "fps": 20,
+  "loop": false,
+  "layout": "horizontal"
+}

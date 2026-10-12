@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://data/item_data.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"scroll_scry"
+name_key = &"item_scroll_scry"
+desc_key = &"item_scroll_scry_desc"
+kind = 0
+effect = 2
+power = 0
+radius = 1
+price = 18
+min_floor = 1
+sold_in_shop = true
+found_in_treasure = true
+attack_bonus = 0
+defense_bonus = 0
+attack_per_upgrade = 0
+defense_per_upgrade = 0
+color = Color(0.4, 0.75, 1, 1)

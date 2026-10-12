@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CraftingMaterial" format=3]
+
+[ext_resource type="Script" path="res://data/crafting_material.gd" id="1_mat"]
+[ext_resource type="Texture2D" path="res://assets/art/resources/resource_magic_crystal.png" id="tex_icon"]
+
+[resource]
+script = ExtResource("1_mat")
+id = &"magic_crystal"
+name_key = &"material_magic_crystal"
+rarity = 1
+min_floor = 2
+drop_weight = 3.0
+weight_per_floor = 0.4
+color = Color(0.45, 0.8, 1, 1)
+icon = ExtResource("tex_icon")

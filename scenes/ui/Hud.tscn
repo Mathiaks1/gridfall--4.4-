@@ -89,9 +89,24 @@ theme_override_font_sizes/font_size = 22
 toggle_mode = true
 text = "Flag mode"
 
-[node name="RestartButton" type="Button" parent="."]
-custom_minimum_size = Vector2(130, 48)
+[node name="PointsButton" type="Button" parent="."]
+custom_minimum_size = Vector2(110, 48)
+layout_mode = 2
+focus_mode = 0
+theme_override_colors/font_color = Color(0.95, 0.78, 0.35, 1)
+theme_override_font_sizes/font_size = 22
+text = "Points"
+
+[node name="InventoryButton" type="Button" parent="."]
+custom_minimum_size = Vector2(140, 48)
 layout_mode = 2
 focus_mode = 0
 theme_override_font_sizes/font_size = 22
-text = "Restart"
+text = "Inventory"
+
+[node name="MenuButton" type="Button" parent="."]
+custom_minimum_size = Vector2(100, 48)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 22
+text = "Menu"
