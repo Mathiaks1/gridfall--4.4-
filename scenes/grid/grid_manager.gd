@@ -15,6 +15,7 @@ var _tile_size: float = 32.0
 var _origin := Vector2.ZERO
 var _held_cell := GridModel.INVALID_CELL
 var _solution_shown: bool = false
+var _highlighted_cell := GridModel.INVALID_CELL
 
 @onready var _grid_input: GridInput = $GridInput
 
@@ -32,6 +33,7 @@ func setup(p_model: GridModel) -> void:
 	model = p_model
 	_solution_shown = false
 	_held_cell = GridModel.INVALID_CELL
+	_highlighted_cell = GridModel.INVALID_CELL
 	for tile in _tiles:
 		tile.queue_free()
 	_tiles.clear()
@@ -45,7 +47,15 @@ func setup(p_model: GridModel) -> void:
 	interactive = true
 	_layout_tiles()
 	_refresh_all()
-	EventBus.flags_changed.emit(model.get_flag_count(), model.hazard_count)
+	_emit_hazard_counter()
+
+
+## Oznacza pole jako rozpatrzone i odświeża jego widok (wołane przez Game po obsłużeniu aktywacji).
+func resolve_cell(cell: Vector2i) -> void:
+	if model == null or not model.is_inside(cell):
+		return
+	model.resolve(cell)
+	_refresh_tile(_tile_at(cell))
 
 
 ## Po porażce: pokazuje wszystkie zagrożenia i błędne flagi.
@@ -69,27 +79,48 @@ func _on_action_triggered(action: GridInput.Action, cell: Vector2i) -> void:
 		return
 	match action:
 		GridInput.Action.REVEAL:
-			var revealed: Array[Vector2i]
-			if model.get_state(cell) == GridModel.CellState.REVEALED:
-				revealed = model.chord(cell)
-			else:
-				revealed = model.reveal(cell)
-			if revealed.is_empty():
-				return
-			_refresh_cells(revealed)
-			EventBus.cells_revealed.emit(revealed)
+			_handle_reveal(cell)
 		GridInput.Action.FLAG:
 			if model.toggle_flag(cell):
 				_refresh_tile(_tile_at(cell))
-				EventBus.flags_changed.emit(model.get_flag_count(), model.hazard_count)
-			return
+				_emit_hazard_counter()
 
-	if model.has_exploded():
-		interactive = false
-		EventBus.hazard_triggered.emit(model.exploded_cell)
-	elif model.is_cleared():
-		interactive = false
-		EventBus.grid_cleared.emit()
+
+func _handle_reveal(cell: Vector2i) -> void:
+	var was_hidden := model.get_state(cell) == GridModel.CellState.HIDDEN
+	if not was_hidden and model.get_state(cell) != GridModel.CellState.REVEALED:
+		return
+
+	# Dotknięcie odkrytego pola specjalnego (skarb, wyjście) = aktywacja
+	if not was_hidden and model.is_special(cell):
+		if not model.is_resolved(cell):
+			EventBus.cell_activated.emit(cell, model.get_content(cell))
+		return
+
+	var revealed := model.reveal(cell) if was_hidden else model.chord(cell)
+	if revealed.is_empty():
+		return
+	_refresh_cells(revealed)
+	# Podświetlenie przeszło na nowe zagrożenie — zgaś je na poprzednim
+	if _highlighted_cell != model.exploded_cell:
+		if model.is_inside(_highlighted_cell):
+			_refresh_tile(_tile_at(_highlighted_cell))
+		_highlighted_cell = model.exploded_cell
+	EventBus.cells_revealed.emit(revealed)
+
+	# Zagrożenie odkryte tą akcją (bezpośrednio albo przez chording) wymaga reakcji gry
+	for c in revealed:
+		if model.is_hazard(c) and not model.is_resolved(c):
+			_emit_hazard_counter()
+			EventBus.cell_activated.emit(c, model.get_content(c))
+			return
+	# Skarb odkryty bezpośrednim kliknięciem zbieramy od razu; wyjście wymaga drugiego dotknięcia
+	if was_hidden and model.get_content(cell) == GridModel.Content.TREASURE:
+		EventBus.cell_activated.emit(cell, GridModel.Content.TREASURE)
+
+
+func _emit_hazard_counter() -> void:
+	EventBus.flags_changed.emit(model.get_marked_hazard_count(), model.hazard_count)
 
 
 func _on_hold_progress_changed(cell: Vector2i, ratio: float) -> void:
@@ -139,4 +170,4 @@ func _refresh_cells(cells: Array[Vector2i]) -> void:
 
 func _refresh_tile(tile: Tile) -> void:
 	var c := tile.cell
-	tile.set_view(model.get_state(c), model.get_content(c), model.get_danger(c), c == model.exploded_cell, _solution_shown)
+	tile.set_view(model.get_state(c), model.get_content(c), model.get_danger(c), model.is_resolved(c), c == model.exploded_cell, _solution_shown)

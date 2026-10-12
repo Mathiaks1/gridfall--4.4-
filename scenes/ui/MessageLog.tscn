@@ -1,0 +1,33 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/ui/message_log.gd" id="1_log"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_log"]
+bg_color = Color(0.09, 0.1, 0.13, 0.9)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="MessageLog" type="PanelContainer"]
+custom_minimum_size = Vector2(0, 92)
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_log")
+script = ExtResource("1_log")
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 6
+
+[node name="Label" type="Label" parent="Margin"]
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_colors/font_color = Color(0.85, 0.87, 0.92, 1)
+theme_override_font_sizes/font_size = 19
+text = "Log"
+vertical_alignment = 2
+autowrap_mode = 3

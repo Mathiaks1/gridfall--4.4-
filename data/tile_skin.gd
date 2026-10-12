@@ -13,6 +13,13 @@ extends Resource
 @export var flag_pole_color := Color("c9ccd6")
 @export var wrong_flag_color := Color("ff5a5a")
 @export var hold_feedback_color := Color(1.0, 1.0, 1.0, 0.22)
+@export var monster_color := Color("9b4fd1")
+@export var monster_eye_color := Color("f5f0e0")
+@export var treasure_color := Color("8a5a2b")
+@export var treasure_trim_color := Color("f0c040")
+@export var exit_color := Color("4fc3d9")
+## Przezroczystość ikon pól rozpatrzonych (pokonany potwór, zebrany skarb, zużyta pułapka).
+@export_range(0.0, 1.0, 0.05) var resolved_alpha: float = 0.35
 ## Kolory cyfr 1–8 (indeks 0 = cyfra 1).
 @export var number_colors: Array[Color] = [
 	Color("5aa9ff"), Color("5fd16a"), Color("ff6b6b"), Color("b57bff"),
@@ -24,6 +31,9 @@ extends Resource
 @export var revealed_texture: Texture2D
 @export var flag_texture: Texture2D
 @export var hazard_texture: Texture2D
+@export var monster_texture: Texture2D
+@export var treasure_texture: Texture2D
+@export var exit_texture: Texture2D
 ## Tekstury cyfr: indeks = liczba (0–8). Puste/brakujące = rysowanie tekstem.
 @export var number_textures: Array[Texture2D] = []
 

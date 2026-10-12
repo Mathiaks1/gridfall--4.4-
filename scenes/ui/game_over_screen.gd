@@ -1,6 +1,6 @@
 class_name GameOverScreen
 extends Control
-## Nakładka końca gry / oczyszczonego piętra z przyciskiem ponownej gry.
+## Nakładka końca gry ze statystykami runu i przyciskiem ponownej gry.
 
 signal restart_requested
 
@@ -15,8 +15,8 @@ func _ready() -> void:
 	_restart_button.pressed.connect(restart_requested.emit)
 
 
-func show_result(won: bool, info: String) -> void:
-	_title_label.text = UiText.t(&"result_won" if won else &"result_lost")
+func show_game_over(info: String) -> void:
+	_title_label.text = UiText.t(&"result_lost")
 	_info_label.text = info
 	show()
 	_restart_button.grab_focus()

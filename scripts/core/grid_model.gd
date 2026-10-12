@@ -3,7 +3,7 @@ extends RefCounted
 ## Czysta logika siatki: generacja, odkrywanie, flagi, chording.
 ## Bez węzłów — testowalna i deterministyczna względem seeda.
 
-## Zawartość pola. Faza 1 używa EMPTY i TRAP; reszta jest gotowa na Fazy 2–3.
+## Zawartość pola. SHOP/BLACKSMITH/RESOURCE czekają na Fazę 3.
 enum Content { EMPTY, TRAP, MONSTER, TREASURE, EXIT, SHOP, BLACKSMITH, RESOURCE }
 enum CellState { HIDDEN, REVEALED, FLAGGED }
 
@@ -20,13 +20,29 @@ var hazard_count: int
 var run_seed: int
 var safe_radius: int
 var is_generated: bool = false
+## Ostatnio uruchomione zagrożenie (pułapka/potwór).
 var exploded_cell: Vector2i = INVALID_CELL
+
+# Zawartość dodatkowa — ustawiana przed generacją (create_for_floor). Domyślnie: czysty saper.
+## Ile z hazard_count to potwory (reszta to pułapki).
+var monster_count: int = 0
+## Liczba typów potworów do wylosowania; payload potwora = indeks typu.
+var monster_kinds: int = 1
+var treasure_count: int = 0
+## Zakres złota w skarbie (payload skarbu).
+var treasure_gold := Vector2i(1, 1)
+var has_exit: bool = false
 
 var _content := PackedByteArray()
 var _state := PackedByteArray()
 var _danger := PackedByteArray()
+## Dane pola zależne od zawartości: typ potwora, ilość złota.
+var _payload := PackedInt32Array()
+## Pole "rozpatrzone": pułapka zadziałała, potwór pokonany, skarb zebrany.
+var _resolved := PackedByteArray()
 var _revealed_safe_count: int = 0
 var _flag_count: int = 0
+var _revealed_hazard_count: int = 0
 
 
 func _init(p_width: int, p_height: int, p_hazard_count: int, p_run_seed: int, p_safe_radius: int = 1) -> void:
@@ -43,17 +59,27 @@ func _init(p_width: int, p_height: int, p_hazard_count: int, p_run_seed: int, p_
 	_state.fill(CellState.HIDDEN)
 	_danger.resize(total)
 	_danger.fill(0)
+	_payload.resize(total)
+	_payload.fill(0)
+	_resolved.resize(total)
+	_resolved.fill(0)
 
 
 ## Tworzy model dla danego piętra na podstawie konfiguracji (rozmiar i gęstość skalują się z piętrem).
 static func create_for_floor(config: FloorConfig, floor_number: int, p_run_seed: int) -> GridModel:
-	return GridModel.new(
+	var model := GridModel.new(
 		config.get_width(floor_number),
 		config.get_height(floor_number),
 		config.get_hazard_count(floor_number),
 		p_run_seed,
 		config.safe_radius
 	)
+	model.monster_count = config.get_monster_count(floor_number)
+	model.monster_kinds = maxi(config.get_monsters_for_floor(floor_number).size(), 1)
+	model.treasure_count = config.get_treasure_count(floor_number)
+	model.treasure_gold = config.get_treasure_gold_range(floor_number)
+	model.has_exit = config.has_exit
+	return model
 
 
 # --- Generacja -------------------------------------------------------------
@@ -94,14 +120,41 @@ func generate(safe_cell: Vector2i) -> void:
 		candidates[j] = tmp
 
 	hazard_count = mini(hazard_count, candidates.size())
+	var monsters := clampi(monster_count, 0, hazard_count)
 	for k in range(hazard_count):
-		_content[candidates[k]] = Content.TRAP
+		var i := candidates[k]
+		if k < monsters:
+			_content[i] = Content.MONSTER
+			_payload[i] = rng.randi_range(0, maxi(monster_kinds, 1) - 1)
+		else:
+			_content[i] = Content.TRAP
+
+	# Pola specjalne z pozostałych kandydatów (poza strefą startu)
+	var rest := candidates.slice(hazard_count)
+	if has_exit and not rest.is_empty():
+		var exit_pos := _pick_far_index(rest, safe_cell)
+		_content[rest[exit_pos]] = Content.EXIT
+		rest.remove_at(exit_pos)
+	for k in range(mini(treasure_count, rest.size())):
+		_content[rest[k]] = Content.TREASURE
+		_payload[rest[k]] = rng.randi_range(treasure_gold.x, maxi(treasure_gold.y, treasure_gold.x))
 	_finish_generation()
+
+
+## Wybiera (z już przetasowanej listy) pierwsze pole odległe od startu o co najmniej pół planszy.
+func _pick_far_index(indices: Array[int], from: Vector2i) -> int:
+	var min_dist := maxi(width, height) / 2.0
+	for k in range(indices.size()):
+		var c := _cell_from_index(indices[k])
+		if maxi(absi(c.x - from.x), absi(c.y - from.y)) >= min_dist:
+			return k
+	return 0
 
 
 ## Ustawia konkretny układ zagrożeń (testy, w przyszłości wczytywanie zapisu).
 func setup_layout(hazard_cells: Array[Vector2i]) -> void:
 	_content.fill(Content.EMPTY)
+	_payload.fill(0)
 	var placed := 0
 	for c in hazard_cells:
 		if is_inside(c) and _content[_index(c)] == Content.EMPTY:
@@ -111,7 +164,19 @@ func setup_layout(hazard_cells: Array[Vector2i]) -> void:
 	_finish_generation()
 
 
+## Ustawia zawartość pojedynczego pola (testy / wczytywanie). Wołać po setup_layout.
+func set_cell_content(cell: Vector2i, content: Content, payload: int = 0) -> void:
+	var i := _index(cell)
+	var was_hazard := is_hazard(cell)
+	_content[i] = content
+	_payload[i] = payload
+	if was_hazard != is_hazard(cell):
+		hazard_count += 1 if is_hazard(cell) else -1
+	_finish_generation()
+
+
 func _finish_generation() -> void:
+	_revealed_safe_count = 0
 	for i in range(width * height):
 		var cell := _cell_from_index(i)
 		var count := 0
@@ -119,6 +184,8 @@ func _finish_generation() -> void:
 			if is_hazard(n):
 				count += 1
 		_danger[i] = count
+		if _state[i] == CellState.REVEALED and not is_hazard(cell):
+			_revealed_safe_count += 1
 	is_generated = true
 
 
@@ -140,6 +207,7 @@ func reveal(cell: Vector2i) -> Array[Vector2i]:
 	revealed.append(cell)
 	if is_hazard(cell):
 		exploded_cell = cell
+		_revealed_hazard_count += 1
 		return revealed
 	_revealed_safe_count += 1
 
@@ -161,18 +229,19 @@ func reveal(cell: Vector2i) -> Array[Vector2i]:
 	return revealed
 
 
-## Chording: na odkrytym polu z liczbą, gdy liczba flag wokół == liczba, odkrywa resztę sąsiadów.
+## Chording: na odkrytym polu z liczbą, gdy flagi + znane zagrożenia wokół == liczba, odkrywa resztę sąsiadów.
 func chord(cell: Vector2i) -> Array[Vector2i]:
 	var revealed: Array[Vector2i] = []
 	if not is_inside(cell) or get_state(cell) != CellState.REVEALED or is_hazard(cell):
 		return revealed
 	var danger := get_danger(cell)
-	if danger == 0 or count_adjacent_flags(cell) != danger:
+	if danger == 0 or count_known_adjacent_hazards(cell) != danger:
 		return revealed
 	for n in get_neighbors(cell):
 		if get_state(n) == CellState.HIDDEN:
 			revealed.append_array(reveal(n))
-			if has_exploded():
+			# Jedno uruchomione zagrożenie na akcję
+			if is_hazard(n):
 				break
 	return revealed
 
@@ -192,6 +261,12 @@ func toggle_flag(cell: Vector2i) -> bool:
 			_flag_count -= 1
 			return true
 	return false
+
+
+## Oznacza pole jako rozpatrzone (pułapka zadziałała, potwór pokonany, skarb zebrany).
+func resolve(cell: Vector2i) -> void:
+	if is_inside(cell):
+		_resolved[_index(cell)] = 1
 
 
 ## Po porażce: odsłania wszystkie nieoflagowane zagrożenia. Zwraca zmienione pola.
@@ -224,6 +299,21 @@ func get_danger(cell: Vector2i) -> int:
 	return _danger[_index(cell)]
 
 
+## Typ potwora (indeks w puli piętra) albo ilość złota w skarbie.
+func get_payload(cell: Vector2i) -> int:
+	return _payload[_index(cell)]
+
+
+func is_resolved(cell: Vector2i) -> bool:
+	return _resolved[_index(cell)] != 0
+
+
+## Pola specjalne niebędące zagrożeniem (skarb, wyjście, ...): aktywowane dotknięciem.
+func is_special(cell: Vector2i) -> bool:
+	var c := _content[_index(cell)]
+	return c != Content.EMPTY and c != Content.TRAP and c != Content.MONSTER
+
+
 func is_hazard(cell: Vector2i) -> bool:
 	var c := _content[_index(cell)]
 	return c == Content.TRAP or c == Content.MONSTER
@@ -246,8 +336,23 @@ func count_adjacent_flags(cell: Vector2i) -> int:
 	return count
 
 
+## Flagi + już odkryte zagrożenia (zużyte pułapki, pokonane potwory) wokół pola.
+func count_known_adjacent_hazards(cell: Vector2i) -> int:
+	var count := 0
+	for n in get_neighbors(cell):
+		var st := get_state(n)
+		if st == CellState.FLAGGED or (st == CellState.REVEALED and is_hazard(n)):
+			count += 1
+	return count
+
+
 func get_flag_count() -> int:
 	return _flag_count
+
+
+## Zagrożenia już zidentyfikowane: flagi + odkryte (zużyte pułapki, potwory po walce).
+func get_marked_hazard_count() -> int:
+	return _flag_count + _revealed_hazard_count
 
 
 func get_safe_total() -> int:
@@ -262,9 +367,9 @@ func has_exploded() -> bool:
 	return exploded_cell != INVALID_CELL
 
 
-## Klasyczny warunek wygranej sapera: wszystkie bezpieczne pola odkryte.
+## Wszystkie bezpieczne pola odkryte (od Fazy 2 nie kończy gry — warunkiem przejścia jest wyjście).
 func is_cleared() -> bool:
-	return is_generated and not has_exploded() and _revealed_safe_count == get_safe_total()
+	return is_generated and _revealed_safe_count == get_safe_total()
 
 
 func _index(cell: Vector2i) -> int:

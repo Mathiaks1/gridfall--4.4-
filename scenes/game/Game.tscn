@@ -6,6 +6,8 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/Hud.tscn" id="4_hud"]
 [ext_resource type="PackedScene" path="res://scenes/grid/GridManager.tscn" id="5_grid"]
 [ext_resource type="PackedScene" path="res://scenes/ui/GameOverScreen.tscn" id="6_over"]
+[ext_resource type="Resource" path="res://data/player_base_stats.tres" id="7_player"]
+[ext_resource type="PackedScene" path="res://scenes/ui/MessageLog.tscn" id="8_log"]
 
 [node name="Game" type="Control"]
 layout_mode = 3
@@ -16,6 +18,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_game")
 floor_config = ExtResource("2_config")
+base_player_stats = ExtResource("7_player")
 
 [node name="Background" type="ColorRect" parent="."]
 layout_mode = 1
@@ -48,6 +51,9 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
+
+[node name="MessageLog" parent="SafeArea/Layout" instance=ExtResource("8_log")]
+layout_mode = 2
 
 [node name="GameOverScreen" parent="." instance=ExtResource("6_over")]
 unique_name_in_owner = true

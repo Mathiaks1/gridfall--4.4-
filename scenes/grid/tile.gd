@@ -10,7 +10,8 @@ var skin: TileSkin
 var _state: GridModel.CellState = GridModel.CellState.HIDDEN
 var _content: GridModel.Content = GridModel.Content.EMPTY
 var _danger: int = 0
-var _exploded: bool = false
+var _resolved: bool = false
+var _highlight: bool = false
 var _show_solution: bool = false
 var _hold_progress: float = 0.0
 
@@ -19,11 +20,13 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 
-func set_view(state: GridModel.CellState, content: GridModel.Content, danger: int, exploded: bool, show_solution: bool) -> void:
+## highlight = ostatnio uruchomione zagrożenie (czerwone tło).
+func set_view(state: GridModel.CellState, content: GridModel.Content, danger: int, resolved: bool, highlight: bool, show_solution: bool) -> void:
 	_state = state
 	_content = content
 	_danger = danger
-	_exploded = exploded
+	_resolved = resolved
+	_highlight = highlight
 	_show_solution = show_solution
 	queue_redraw()
 
@@ -69,12 +72,23 @@ func _draw_revealed(rect: Rect2) -> void:
 	if skin.revealed_texture:
 		draw_texture_rect(skin.revealed_texture, rect, false)
 	else:
-		draw_rect(rect, skin.exploded_background_color if _exploded else skin.revealed_color)
+		draw_rect(rect, skin.exploded_background_color if _highlight else skin.revealed_color)
 		draw_rect(rect, skin.revealed_border_color, false, 1.0)
-	if _is_hazard():
-		_draw_hazard(rect)
-	elif _danger > 0:
-		_draw_number(rect, _danger)
+	var alpha := skin.resolved_alpha if _resolved else 1.0
+	match _content:
+		GridModel.Content.TRAP:
+			_draw_trap(rect, alpha)
+		GridModel.Content.MONSTER:
+			_draw_monster(rect, alpha)
+		GridModel.Content.TREASURE:
+			_draw_treasure(rect, alpha)
+			_draw_corner_number(rect)
+		GridModel.Content.EXIT:
+			_draw_exit(rect)
+			_draw_corner_number(rect)
+		_:
+			if _danger > 0:
+				_draw_number(rect, _danger)
 
 
 func _draw_number(rect: Rect2, number: int) -> void:
@@ -82,25 +96,80 @@ func _draw_number(rect: Rect2, number: int) -> void:
 	if tex:
 		draw_texture_rect(tex, rect, false)
 		return
+	_draw_text_centered(rect, str(number), skin.font_size_ratio, skin.get_number_color(number))
+
+
+## Pola specjalne też mają sąsiadów-zagrożenia — pokazujemy liczbę w rogu, żeby nie tracić informacji.
+func _draw_corner_number(rect: Rect2) -> void:
+	if _danger <= 0:
+		return
+	var corner := Rect2(rect.end - rect.size * 0.42, rect.size * 0.42)
+	_draw_text_centered(corner, str(_danger), 0.9, skin.get_number_color(_danger))
+
+
+func _draw_text_centered(rect: Rect2, text: String, size_ratio: float, color: Color) -> void:
 	var font: Font = skin.font if skin.font else ThemeDB.fallback_font
-	var font_size := maxi(int(rect.size.y * skin.font_size_ratio), 8)
+	var font_size := maxi(int(rect.size.y * size_ratio), 8)
 	var baseline := rect.position.y + (rect.size.y + font.get_ascent(font_size) - font.get_descent(font_size)) * 0.5
-	draw_string(font, Vector2(rect.position.x, baseline), str(number), HORIZONTAL_ALIGNMENT_CENTER, rect.size.x, font_size, skin.get_number_color(number))
+	draw_string(font, Vector2(rect.position.x, baseline), text, HORIZONTAL_ALIGNMENT_CENTER, rect.size.x, font_size, color)
 
 
-func _draw_hazard(rect: Rect2) -> void:
+func _draw_trap(rect: Rect2, alpha: float) -> void:
 	if skin.hazard_texture:
-		draw_texture_rect(skin.hazard_texture, rect, false)
+		draw_texture_rect(skin.hazard_texture, rect, false, Color(1, 1, 1, alpha))
 		return
 	# Placeholder: kolczasta kula
+	var color := Color(skin.hazard_color, alpha)
 	var center := rect.get_center()
-	var r := rect.size.x * 0.22
 	var spike := rect.size.x * 0.34
 	var w := maxf(rect.size.x * 0.06, 1.0)
 	for i in range(4):
 		var dir := Vector2.RIGHT.rotated(PI * 0.25 * i)
-		draw_line(center - dir * spike, center + dir * spike, skin.hazard_color, w)
-	draw_circle(center, r, skin.hazard_color)
+		draw_line(center - dir * spike, center + dir * spike, color, w)
+	draw_circle(center, rect.size.x * 0.22, color)
+
+
+func _draw_monster(rect: Rect2, alpha: float) -> void:
+	if skin.monster_texture:
+		draw_texture_rect(skin.monster_texture, rect, false, Color(1, 1, 1, alpha))
+		return
+	# Placeholder: głowa z rogami i oczami
+	var s := rect.size.x
+	var c := rect.get_center() + Vector2(0, s * 0.05)
+	var body := Color(skin.monster_color, alpha)
+	var eye := Color(skin.monster_eye_color, alpha)
+	draw_colored_polygon(PackedVector2Array([c + Vector2(-s * 0.28, -s * 0.12), c + Vector2(-s * 0.34, -s * 0.38), c + Vector2(-s * 0.1, -s * 0.24)]), body)
+	draw_colored_polygon(PackedVector2Array([c + Vector2(s * 0.28, -s * 0.12), c + Vector2(s * 0.34, -s * 0.38), c + Vector2(s * 0.1, -s * 0.24)]), body)
+	draw_circle(c, s * 0.3, body)
+	draw_circle(c + Vector2(-s * 0.11, -s * 0.04), s * 0.065, eye)
+	draw_circle(c + Vector2(s * 0.11, -s * 0.04), s * 0.065, eye)
+	if _resolved:
+		_draw_cross(rect, Color(skin.revealed_border_color, 1.0))
+
+
+func _draw_treasure(rect: Rect2, alpha: float) -> void:
+	if skin.treasure_texture:
+		draw_texture_rect(skin.treasure_texture, rect, false, Color(1, 1, 1, alpha))
+		return
+	# Placeholder: skrzynia
+	var s := rect.size.x
+	var box := Rect2(rect.position + Vector2(s * 0.2, s * 0.32), Vector2(s * 0.6, s * 0.42))
+	var trim := Color(skin.treasure_trim_color, alpha)
+	draw_rect(box, Color(skin.treasure_color, alpha))
+	draw_rect(Rect2(box.position, Vector2(box.size.x, box.size.y * 0.3)), trim, false, maxf(s * 0.04, 1.0))
+	draw_rect(Rect2(box.get_center() - Vector2(s * 0.05, s * 0.02), Vector2(s * 0.1, s * 0.12)), trim)
+
+
+func _draw_exit(rect: Rect2) -> void:
+	if skin.exit_texture:
+		draw_texture_rect(skin.exit_texture, rect, false)
+		return
+	# Placeholder: schody w dół
+	var s := rect.size.x
+	var step := s * 0.16
+	var origin := rect.position + Vector2(s * 0.2, s * 0.24)
+	for i in range(4):
+		draw_rect(Rect2(origin + Vector2(step * i, step * i), Vector2(s * 0.6 - step * i, step * 0.8)), skin.exit_color)
 
 
 func _draw_flag(rect: Rect2) -> void:

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3]
+
+[ext_resource type="Script" path="res://data/monster_data.gd" id="1_monster"]
+
+[resource]
+script = ExtResource("1_monster")
+id = &"orc"
+name_key = &"monster_orc"
+min_floor = 5
+max_hp = 20
+attack = 7
+defense = 2
+gold_reward = 12
+exp_reward = 22
+color = Color(0.75, 0.3, 0.25, 1)
